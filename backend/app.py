@@ -5,10 +5,10 @@ import pandas as pd
 app = Flask(__name__)
 
 # Load the trained model
-model = joblib.load("../model/ddos_xgboost.pkl")
+model = joblib.load("model/ddos_xgboost.pkl")
 
 # Load feature names
-feature_names = joblib.load("../model/feature_names.pkl")
+feature_names = joblib.load("model/feature_names.pkl")
 
 
 @app.route("/")
