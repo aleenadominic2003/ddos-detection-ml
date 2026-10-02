@@ -1,0 +1,408 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>DDoS Guard AI</title>
+
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: Arial, sans-serif;
+        }
+
+        body {
+            background: #f4f6f9;
+            color: #1f2937;
+        }
+
+        .layout {
+            display: flex;
+            min-height: 100vh;
+        }
+
+        /* Sidebar */
+
+        .sidebar {
+            width: 240px;
+            background: #111827;
+            color: white;
+            padding: 25px 15px;
+        }
+
+        .logo {
+            font-size: 20px;
+            font-weight: bold;
+            margin-bottom: 35px;
+            padding-left: 10px;
+        }
+
+        .logo span {
+            color: #38bdf8;
+        }
+
+        .menu {
+            list-style: none;
+        }
+
+        .menu li {
+            padding: 14px 12px;
+            margin-bottom: 8px;
+            border-radius: 8px;
+            cursor: pointer;
+        }
+
+        .menu li:hover,
+        .menu .active {
+            background: #1e40af;
+        }
+
+        /* Main */
+
+        .main {
+            flex: 1;
+            padding: 25px;
+        }
+
+        .topbar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 25px;
+        }
+
+        .topbar h1 {
+            font-size: 28px;
+        }
+
+        .status {
+            background: #dcfce7;
+            color: #166534;
+            padding: 10px 18px;
+            border-radius: 20px;
+            font-weight: bold;
+        }
+
+        /* Cards */
+
+        .cards {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 20px;
+            margin-bottom: 25px;
+        }
+
+        .card {
+            background: white;
+            padding: 22px;
+            border-radius: 12px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+        }
+
+        .card h3 {
+            font-size: 14px;
+            color: #6b7280;
+            margin-bottom: 10px;
+        }
+
+        .card .value {
+            font-size: 28px;
+            font-weight: bold;
+        }
+
+        .normal {
+            color: #16a34a;
+        }
+
+        .warning {
+            color: #f59e0b;
+        }
+
+        .danger {
+            color: #dc2626;
+        }
+
+        /* Sections */
+
+        .grid {
+            display: grid;
+            grid-template-columns: 2fr 1fr;
+            gap: 20px;
+        }
+
+        .panel {
+            background: white;
+            padding: 22px;
+            border-radius: 12px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+        }
+
+        .panel h2 {
+            margin-bottom: 20px;
+            font-size: 18px;
+        }
+
+        .traffic-box {
+            height: 250px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: #f8fafc;
+            border-radius: 10px;
+            color: #64748b;
+        }
+
+        .alert {
+            padding: 15px;
+            background: #fef3c7;
+            border-left: 5px solid #f59e0b;
+            border-radius: 6px;
+            margin-bottom: 12px;
+        }
+
+        .alert strong {
+            display: block;
+            margin-bottom: 5px;
+        }
+
+        /* Responsive */
+
+        @media (max-width: 1000px) {
+            .cards {
+                grid-template-columns: repeat(2, 1fr);
+            }
+
+            .grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        @media (max-width: 700px) {
+            .sidebar {
+                display: none;
+            }
+
+            .cards {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+<div class="layout">
+
+    <!-- Sidebar -->
+
+    <aside class="sidebar">
+
+        <div class="logo">
+            🛡 DDoS <span>Guard AI</span>
+        </div>
+
+        <ul class="menu">
+
+            <li class="active">🏠 Dashboard</li>
+
+            <li>📡 Live Monitoring</li>
+
+            <li>🤖 Detection</li>
+
+            <li>🚨 Alerts</li>
+
+            <li>📁 Upload & Analyze</li>
+
+            <li>📊 Analytics</li>
+
+            <li>📜 History</li>
+
+            <li>🚪 Logout</li>
+
+        </ul>
+
+    </aside>
+
+
+    <!-- Main Content -->
+
+    <main class="main">
+
+        <div class="topbar">
+
+            <div>
+                <h1>Security Dashboard</h1>
+                <p>Machine Learning-Based DDoS Detection</p>
+            </div>
+
+            <div class="status">
+                ● SYSTEM ONLINE
+            </div>
+
+        </div>
+
+
+        <!-- Statistics -->
+
+        <div class="cards">
+
+            <div class="card">
+                <h3>Total Requests</h3>
+                <div class="value" id="totalRequests">0</div>
+            </div>
+
+            <div class="card">
+                <h3>Requests / Second</h3>
+                <div class="value" id="requestsPerSecond">0</div>
+            </div>
+
+            <div class="card">
+                <h3>Normal Traffic</h3>
+                <div class="value normal" id="normalTraffic">0</div>
+            </div>
+
+            <div class="card">
+                <h3>DDoS Alerts</h3>
+                <div class="value danger" id="ddosAlerts">0</div>
+            </div>
+
+        </div>
+
+
+        <!-- Main Panels -->
+
+        <div class="grid">
+
+            <div class="panel">
+
+                <h2>📡 Live Traffic Monitoring</h2>
+
+                <div class="traffic-box">
+
+                    Traffic monitoring data will appear here
+
+                </div>
+
+            </div>
+
+
+            <div class="panel">
+
+                <h2>🚨 Recent Alerts</h2>
+
+                <div class="alert">
+
+                    <strong>No active threats</strong>
+
+                    System is currently monitoring network traffic.
+
+                </div>
+
+                <div class="alert">
+
+                    <strong>ML Engine Ready</strong>
+
+                    XGBoost detection model loaded successfully.
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </main>
+
+</div>
+<script>
+
+async function loadTrafficData() {
+
+    try {
+
+        const response = await fetch(
+            "http://127.0.0.1:5000/traffic"
+        );
+
+        const data = await response.json();
+
+        // Application-level traffic
+        document.getElementById(
+            "totalRequests"
+        ).textContent = data.total_requests;
+
+        document.getElementById(
+            "requestsPerSecond"
+        ).textContent = data.peak_rps;
+
+    }
+
+    catch (error) {
+
+        console.error(
+            "Unable to load traffic data:",
+            error
+        );
+
+    }
+
+}
+
+
+async function loadDetectionData() {
+
+    try {
+
+        const response = await fetch(
+            "http://127.0.0.1:5000/detection"
+        );
+
+        const data = await response.json();
+
+        // ML BENIGN flows
+        document.getElementById(
+            "normalTraffic"
+        ).textContent = data.benign_flows;
+
+        // ML DDoS flows
+        document.getElementById(
+            "ddosAlerts"
+        ).textContent = data.ddos_flows;
+
+    }
+
+    catch (error) {
+
+        console.error(
+            "Unable to load detection data:",
+            error
+        );
+
+    }
+
+}
+
+
+// Load data when dashboard opens
+loadTrafficData();
+loadDetectionData();
+
+
+// Refresh application traffic every 5 seconds
+setInterval(
+    loadTrafficData,
+    5000
+);
+
+
+// Refresh ML detection results every 5 seconds
+setInterval(
+    loadDetectionData,
+    5000
+);
+
+</script>
+</body>
+</html>
