@@ -189,6 +189,20 @@
                 grid-template-columns: 1fr;
             }
         }
+        .status-normal {
+    color: #16a34a;
+    font-weight: bold;
+}
+
+.status-warning {
+    color: #f59e0b;
+    font-weight: bold;
+}
+
+.status-danger {
+    color: #dc2626;
+    font-weight: bold;
+}
     </style>
 </head>
 
@@ -287,7 +301,67 @@
                 </div>
 
             </div>
+            <!-- ML Detection Results -->
 
+<div class="panel" style="margin-top: 20px;">
+
+    <h2>🤖 ML-Based DDoS Detection</h2>
+
+    <div class="detection-grid">
+
+        <div>
+            <strong>Traffic Status</strong>
+            <p id="trafficStatus">--</p>
+        </div>
+
+        <div>
+            <strong>ML Classification</strong>
+            <p id="mlStatus">--</p>
+        </div>
+
+        <div>
+            <strong>Risk Level</strong>
+            <p id="riskLevel">--</p>
+        </div>
+
+        <div>
+            <strong>DDoS Probability</strong>
+            <p id="ddosProbability">--</p>
+        </div>
+
+        <div>
+            <strong>Total Flows</strong>
+            <p id="totalFlows">--</p>
+        </div>
+
+        <div>
+            <strong>Benign Flows</strong>
+            <p id="benignFlows">--</p>
+        </div>
+
+        <div>
+            <strong>DDoS Flows</strong>
+            <p id="ddosFlows">--</p>
+        </div>
+
+        <div>
+            <strong>Peak Flow Rate</strong>
+            <p id="peakFlowRate">--</p>
+        </div>
+
+        <div>
+            <strong>Average Flow Rate</strong>
+            <p id="averageFlowRate">--</p>
+        </div>
+
+        <div>
+            <strong>Response</strong>
+            <p id="responseAction">--</p>
+        </div>
+
+    </div>
+
+</div>
 
             <div class="panel">
 
@@ -366,6 +440,101 @@ async function loadDetectionData() {
             "normalTraffic"
         ).textContent = data.benign_flows;
 
+        document.getElementById(
+    "trafficStatus"
+).textContent = data.traffic_status;
+
+const mlStatusElement =
+    document.getElementById("mlStatus");
+
+const riskElement =
+    document.getElementById("riskLevel");
+
+mlStatusElement.textContent =
+    data.ml_status;
+
+riskElement.textContent =
+    data.risk_level;
+
+
+// Reset status styles
+mlStatusElement.className = "";
+riskElement.className = "";
+
+
+// ML classification color
+if (data.ml_status === "BENIGN") {
+
+    mlStatusElement.classList.add(
+        "status-normal"
+    );
+
+}
+else {
+
+    mlStatusElement.classList.add(
+        "status-danger"
+    );
+
+}
+
+
+// Risk level color
+if (data.risk_level === "LOW") {
+
+    riskElement.classList.add(
+        "status-normal"
+    );
+
+}
+else if (
+    data.risk_level === "MEDIUM" ||
+    data.risk_level === "HIGH"
+) {
+
+    riskElement.classList.add(
+        "status-warning"
+    );
+
+}
+else {
+
+    riskElement.classList.add(
+        "status-danger"
+    );
+
+}
+
+document.getElementById(
+    "ddosProbability"
+).textContent =
+    data.max_ddos_probability + "%";
+
+document.getElementById(
+    "totalFlows"
+).textContent = data.total_flows;
+
+document.getElementById(
+    "benignFlows"
+).textContent = data.benign_flows;
+
+document.getElementById(
+    "ddosFlows"
+).textContent = data.ddos_flows;
+
+document.getElementById(
+    "peakFlowRate"
+).textContent =
+    data.peak_flow_rate + " packets/s";
+
+document.getElementById(
+    "averageFlowRate"
+).textContent =
+    data.average_flow_rate + " packets/s";
+
+document.getElementById(
+    "responseAction"
+).textContent = data.response;
         // ML DDoS flows
         document.getElementById(
             "ddosAlerts"

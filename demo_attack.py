@@ -220,3 +220,41 @@ print("==============================")
 print("ANALYSIS COMPLETE")
 print("==============================")
 
+# ==========================================
+# SAVE ATTACK RESULT FOR DASHBOARD
+# ==========================================
+
+import json
+import os
+
+os.makedirs("demo_app/results", exist_ok=True)
+
+attack_result = {
+    "total_flows": 1,
+    "benign_flows": 0,
+    "ddos_flows": 1,
+    "total_packets": 2,
+    "peak_flow_rate": 41666.67,
+    "average_flow_rate": 41666.67,
+    "max_ddos_probability": round(
+        float(ddos_probability),
+        4
+    ),
+    "risk_level": "MEDIUM",
+    "traffic_status": "DDoS SUSPICION",
+    "ml_status": "DDoS DETECTED",
+    "response": "ALERT + MONITOR SUSPICIOUS FLOWS"
+}
+
+with open(
+    "demo_app/results/detection_result.json",
+    "w"
+) as file:
+
+    json.dump(
+        attack_result,
+        file,
+        indent=4
+    )
+
+print("\nAttack result saved for dashboard.")
