@@ -1,577 +1,467 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
-    <title>DDoS Guard AI</title>
-
-    <style>
-        * {
-            box-sizing: border-box;
-            margin: 0;
-            padding: 0;
-            font-family: Arial, sans-serif;
-        }
-
-        body {
-            background: #f4f6f9;
-            color: #1f2937;
-        }
-
-        .layout {
-            display: flex;
-            min-height: 100vh;
-        }
-
-        /* Sidebar */
-
-        .sidebar {
-            width: 240px;
-            background: #111827;
-            color: white;
-            padding: 25px 15px;
-        }
-
-        .logo {
-            font-size: 20px;
-            font-weight: bold;
-            margin-bottom: 35px;
-            padding-left: 10px;
-        }
-
-        .logo span {
-            color: #38bdf8;
-        }
-
-        .menu {
-            list-style: none;
-        }
-
-        .menu li {
-            padding: 14px 12px;
-            margin-bottom: 8px;
-            border-radius: 8px;
-            cursor: pointer;
-        }
-
-        .menu li:hover,
-        .menu .active {
-            background: #1e40af;
-        }
-
-        /* Main */
-
-        .main {
-            flex: 1;
-            padding: 25px;
-        }
-
-        .topbar {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 25px;
-        }
-
-        .topbar h1 {
-            font-size: 28px;
-        }
-
-        .status {
-            background: #dcfce7;
-            color: #166534;
-            padding: 10px 18px;
-            border-radius: 20px;
-            font-weight: bold;
-        }
-
-        /* Cards */
-
-        .cards {
-            display: grid;
-            grid-template-columns: repeat(4, 1fr);
-            gap: 20px;
-            margin-bottom: 25px;
-        }
-
-        .card {
-            background: white;
-            padding: 22px;
-            border-radius: 12px;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.08);
-        }
-
-        .card h3 {
-            font-size: 14px;
-            color: #6b7280;
-            margin-bottom: 10px;
-        }
-
-        .card .value {
-            font-size: 28px;
-            font-weight: bold;
-        }
-
-        .normal {
-            color: #16a34a;
-        }
-
-        .warning {
-            color: #f59e0b;
-        }
-
-        .danger {
-            color: #dc2626;
-        }
-
-        /* Sections */
-
-        .grid {
-            display: grid;
-            grid-template-columns: 2fr 1fr;
-            gap: 20px;
-        }
-
-        .panel {
-            background: white;
-            padding: 22px;
-            border-radius: 12px;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.08);
-        }
-
-        .panel h2 {
-            margin-bottom: 20px;
-            font-size: 18px;
-        }
-
-        .traffic-box {
-            height: 250px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            background: #f8fafc;
-            border-radius: 10px;
-            color: #64748b;
-        }
-
-        .alert {
-            padding: 15px;
-            background: #fef3c7;
-            border-left: 5px solid #f59e0b;
-            border-radius: 6px;
-            margin-bottom: 12px;
-        }
-
-        .alert strong {
-            display: block;
-            margin-bottom: 5px;
-        }
-
-        /* Responsive */
-
-        @media (max-width: 1000px) {
-            .cards {
-                grid-template-columns: repeat(2, 1fr);
-            }
-
-            .grid {
-                grid-template-columns: 1fr;
-            }
-        }
-
-        @media (max-width: 700px) {
-            .sidebar {
-                display: none;
-            }
-
-            .cards {
-                grid-template-columns: 1fr;
-            }
-        }
-        .status-normal {
-    color: #16a34a;
-    font-weight: bold;
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>DDoS Guard AI</title>
+<style>
+:root{
+    --navy:#101827;
+    --navy2:#172235;
+    --blue:#2563eb;
+    --blue2:#dbeafe;
+    --bg:#f4f6fa;
+    --card:#ffffff;
+    --text:#172033;
+    --muted:#64748b;
+    --green:#16a34a;
+    --red:#dc2626;
+    --orange:#f59e0b;
+    --border:#e5e7eb;
 }
-
-.status-warning {
-    color: #f59e0b;
-    font-weight: bold;
+*{box-sizing:border-box}
+body{margin:0;font-family:Segoe UI,Arial,sans-serif;background:var(--bg);color:var(--text)}
+.app{display:flex;min-height:100vh}
+.sidebar{width:250px;background:var(--navy);color:#fff;padding:22px 14px;position:fixed;left:0;top:0;bottom:0}
+.brand{font-size:22px;font-weight:800;padding:10px 12px 28px}
+.brand span{color:#60a5fa}
+.nav{display:flex;flex-direction:column;gap:6px}
+.nav button{border:0;background:transparent;color:#cbd5e1;text-align:left;padding:13px 14px;border-radius:9px;font-size:15px;cursor:pointer}
+.nav button:hover,.nav button.active{background:#1e3a67;color:#fff}
+.main{margin-left:250px;width:calc(100% - 250px);padding:28px 34px}
+.page{display:none}
+.page.active{display:block}
+.header{display:flex;justify-content:space-between;align-items:center;margin-bottom:24px}
+.header h1{margin:0;font-size:27px}
+.header p{margin:5px 0 0;color:var(--muted)}
+.status-pill{background:#dcfce7;color:#15803d;padding:8px 13px;border-radius:20px;font-weight:700;font-size:13px}
+.grid{display:grid;gap:18px}
+.cards{grid-template-columns:repeat(4,1fr)}
+.card{background:var(--card);border:1px solid var(--border);border-radius:14px;padding:20px;box-shadow:0 3px 12px rgba(15,23,42,.05)}
+.metric-label{color:var(--muted);font-size:14px;font-weight:600}
+.metric{font-size:30px;font-weight:800;margin-top:10px}
+.green{color:var(--green)}
+.red{color:var(--red)}
+.orange{color:var(--orange)}
+.blue{color:var(--blue)}
+.two{grid-template-columns:2fr 1fr;margin-top:20px}
+.section-title{font-size:18px;font-weight:800;margin:0 0 15px}
+.placeholder{height:260px;background:#f8fafc;border-radius:12px;display:flex;align-items:center;justify-content:center;color:#94a3b8}
+.detail-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.detail{padding:11px 12px;background:#f8fafc;border-radius:8px}
+.detail b{display:block;margin-bottom:4px}
+table{width:100%;border-collapse:collapse}
+th,td{padding:12px;border-bottom:1px solid var(--border);text-align:left;font-size:14px}
+th{color:var(--muted);font-size:12px;text-transform:uppercase}
+.badge{display:inline-block;padding:5px 9px;border-radius:15px;font-size:12px;font-weight:700}
+.badge.green{background:#dcfce7}.badge.red{background:#fee2e2}.badge.orange{background:#fef3c7}.badge.blue{background:#dbeafe}
+.btn{border:0;border-radius:8px;padding:11px 16px;font-weight:700;cursor:pointer;background:var(--blue);color:#fff}
+.btn.secondary{background:#e2e8f0;color:#1e293b}
+.btn.danger{background:var(--red)}
+.toolbar{display:flex;gap:10px;flex-wrap:wrap;margin-bottom:18px}
+.stat-row{display:grid;grid-template-columns:repeat(3,1fr);gap:15px}
+.bar-wrap{margin:16px 0}
+.bar-label{display:flex;justify-content:space-between;font-size:13px;margin-bottom:6px}
+.bar{height:14px;background:#e2e8f0;border-radius:10px;overflow:hidden}
+.bar-fill{height:100%;background:var(--blue);border-radius:10px}
+.alert-box{border-left:5px solid var(--red);background:#fff1f2;padding:16px;border-radius:8px}
+.ok-box{border-left:5px solid var(--green);background:#f0fdf4;padding:16px;border-radius:8px}
+.file-input{padding:12px;border:1px dashed #94a3b8;border-radius:10px;width:100%;background:#f8fafc}
+.small{font-size:13px;color:var(--muted)}
+@media(max-width:900px){
+ .sidebar{width:190px}.main{margin-left:190px;width:calc(100% - 190px);padding:20px}
+ .cards{grid-template-columns:repeat(2,1fr)}.two{grid-template-columns:1fr}
 }
-
-.status-danger {
-    color: #dc2626;
-    font-weight: bold;
+@media(max-width:650px){
+ .sidebar{position:relative;width:100%;height:auto}.app{display:block}.main{margin-left:0;width:100%}.cards{grid-template-columns:1fr}
 }
-    </style>
+</style>
 </head>
-
 <body>
+<div class="app">
+<aside class="sidebar">
+    <div class="brand">🛡️ DDOS <span>GUARD AI</span></div>
+    <nav class="nav">
+        <button class="nav-btn active" data-page="dashboard">🏠 Dashboard</button>
+        <button class="nav-btn" data-page="live">📡 Live Monitoring</button>
+        <button class="nav-btn" data-page="detection">🤖 Detection</button>
+        <button class="nav-btn" data-page="alerts">🚨 Alerts</button>
+        <button class="nav-btn" data-page="upload">📁 Upload & Analyze</button>
+        <button class="nav-btn" data-page="analytics">📊 Analytics</button>
+        <button class="nav-btn" data-page="history">📜 History</button>
+        <button class="nav-btn" data-page="logout">🚪 Logout</button>
+    </nav>
+</aside>
 
-<div class="layout">
+<main class="main">
 
-    <!-- Sidebar -->
-
-    <aside class="sidebar">
-
-        <div class="logo">
-            🛡 DDoS <span>Guard AI</span>
-        </div>
-
-        <ul class="menu">
-
-            <li class="active">🏠 Dashboard</li>
-
-            <li>📡 Live Monitoring</li>
-
-            <li>🤖 Detection</li>
-
-            <li>🚨 Alerts</li>
-
-            <li>📁 Upload & Analyze</li>
-
-            <li>📊 Analytics</li>
-
-            <li>📜 History</li>
-
-            <li>🚪 Logout</li>
-
-        </ul>
-
-    </aside>
-
-
-    <!-- Main Content -->
-
-    <main class="main">
-
-        <div class="topbar">
-
-            <div>
-                <h1>Security Dashboard</h1>
-                <p>Machine Learning-Based DDoS Detection</p>
-            </div>
-
-            <div class="status">
-                ● SYSTEM ONLINE
-            </div>
-
-        </div>
-
-
-        <!-- Statistics -->
-
-        <div class="cards">
-
-            <div class="card">
-                <h3>Total Requests</h3>
-                <div class="value" id="totalRequests">0</div>
-            </div>
-
-            <div class="card">
-                <h3>Requests / Second</h3>
-                <div class="value" id="requestsPerSecond">0</div>
-            </div>
-
-            <div class="card">
-                <h3>Normal Traffic</h3>
-                <div class="value normal" id="normalTraffic">0</div>
-            </div>
-
-            <div class="card">
-                <h3>DDoS Alerts</h3>
-                <div class="value danger" id="ddosAlerts">0</div>
-            </div>
-
-        </div>
-
-
-        <!-- Main Panels -->
-
-        <div class="grid">
-
-            <div class="panel">
-
-                <h2>📡 Live Traffic Monitoring</h2>
-
-                <div class="traffic-box">
-
-                    Traffic monitoring data will appear here
-
-                </div>
-
-            </div>
-            <!-- ML Detection Results -->
-
-<div class="panel" style="margin-top: 20px;">
-
-    <h2>🤖 ML-Based DDoS Detection</h2>
-
-    <div class="detection-grid">
-
-        <div>
-            <strong>Traffic Status</strong>
-            <p id="trafficStatus">--</p>
-        </div>
-
-        <div>
-            <strong>ML Classification</strong>
-            <p id="mlStatus">--</p>
-        </div>
-
-        <div>
-            <strong>Risk Level</strong>
-            <p id="riskLevel">--</p>
-        </div>
-
-        <div>
-            <strong>DDoS Probability</strong>
-            <p id="ddosProbability">--</p>
-        </div>
-
-        <div>
-            <strong>Total Flows</strong>
-            <p id="totalFlows">--</p>
-        </div>
-
-        <div>
-            <strong>Benign Flows</strong>
-            <p id="benignFlows">--</p>
-        </div>
-
-        <div>
-            <strong>DDoS Flows</strong>
-            <p id="ddosFlows">--</p>
-        </div>
-
-        <div>
-            <strong>Peak Flow Rate</strong>
-            <p id="peakFlowRate">--</p>
-        </div>
-
-        <div>
-            <strong>Average Flow Rate</strong>
-            <p id="averageFlowRate">--</p>
-        </div>
-
-        <div>
-            <strong>Response</strong>
-            <p id="responseAction">--</p>
-        </div>
-
-    </div>
-
+<section id="dashboard" class="page active">
+<div class="header">
+<div><h1>Security Dashboard</h1><p>Machine learning based DDoS traffic monitoring</p></div>
+<div class="status-pill">● SYSTEM ONLINE</div>
+</div>
+<div class="grid cards">
+<div class="card"><div class="metric-label">Total Requests</div><div id="totalRequests" class="metric">—</div></div>
+<div class="card"><div class="metric-label">Requests / Second</div><div id="requestsPerSecond" class="metric">—</div></div>
+<div class="card"><div class="metric-label">Normal Traffic</div><div id="normalTraffic" class="metric green">—</div></div>
+<div class="card"><div class="metric-label">DDoS Alerts</div><div id="ddosAlerts" class="metric red">—</div></div>
 </div>
 
-            <div class="panel">
-
-                <h2>🚨 Recent Alerts</h2>
-
-                <div class="alert">
-
-                    <strong>No active threats</strong>
-
-                    System is currently monitoring network traffic.
-
-                </div>
-
-                <div class="alert">
-
-                    <strong>ML Engine Ready</strong>
-
-                    XGBoost detection model loaded successfully.
-
-                </div>
-
-            </div>
-
-        </div>
-
-    </main>
-
+<div class="grid two">
+<div class="card">
+<h2 class="section-title">Live Traffic Monitoring</h2>
+<div class="stat-row">
+<div><div class="small">Total Requests</div><b id="dashRequests">—</b></div>
+<div><div class="small">Unique IPs</div><b id="dashIPs">—</b></div>
+<div><div class="small">Peak RPS</div><b id="dashRPS">—</b></div>
 </div>
+<div style="margin-top:20px" class="bar-wrap">
+<div class="bar-label"><span>Current request activity</span><b id="activityText">—</b></div>
+<div class="bar"><div id="activityBar" class="bar-fill" style="width:0%"></div></div>
+</div>
+</div>
+
+<div class="card">
+<h2 class="section-title">ML-Based DDoS Detection</h2>
+<div class="detail-grid">
+<div class="detail"><b>ML Status</b><span id="mlStatus">—</span></div>
+<div class="detail"><b>Risk Level</b><span id="riskLevel">—</span></div>
+<div class="detail"><b>DDoS Probability</b><span id="ddosProbability">—</span></div>
+<div class="detail"><b>Response</b><span id="responseAction">—</span></div>
+</div>
+</div>
+</div>
+</section>
+
+<section id="live" class="page">
+<div class="header"><div><h1>Live Monitoring</h1><p>Application traffic statistics from the protected demo application</p></div></div>
+<div class="grid cards">
+<div class="card"><div class="metric-label">Total Requests</div><div id="liveRequests" class="metric">—</div></div>
+<div class="card"><div class="metric-label">Peak Requests / Second</div><div id="liveRPS" class="metric blue">—</div></div>
+<div class="card"><div class="metric-label">Unique IPs</div><div id="liveIPs" class="metric">—</div></div>
+<div class="card"><div class="metric-label">Avg Response Time</div><div id="liveResponse" class="metric">—</div></div>
+</div>
+<div class="card" style="margin-top:20px">
+<h2 class="section-title">Endpoint Activity</h2>
+<table><thead><tr><th>Endpoint</th><th>Requests</th><th>Share</th></tr></thead><tbody id="endpointTable"></tbody></table>
+</div>
+</section>
+
+<section id="detection" class="page">
+<div class="header"><div><h1>ML Detection</h1><p>Latest XGBoost network-flow classification</p></div><button class="btn" onclick="refreshAll()">Refresh Detection</button></div>
+<div id="detectionBanner"></div>
+<div class="grid cards" style="margin-top:18px">
+<div class="card"><div class="metric-label">Total Flows</div><div id="detFlows" class="metric">—</div></div>
+<div class="card"><div class="metric-label">BENIGN Flows</div><div id="detBenign" class="metric green">—</div></div>
+<div class="card"><div class="metric-label">DDoS Flows</div><div id="detDdos" class="metric red">—</div></div>
+<div class="card"><div class="metric-label">Maximum DDoS Probability</div><div id="detProb" class="metric orange">—</div></div>
+</div>
+<div class="card" style="margin-top:20px">
+<h2 class="section-title">Detection Details</h2>
+<div class="detail-grid">
+<div class="detail"><b>Traffic Status</b><span id="detTraffic">—</span></div>
+<div class="detail"><b>Risk Level</b><span id="detRisk">—</span></div>
+<div class="detail"><b>Peak Flow Rate</b><span id="detPeak">—</span></div>
+<div class="detail"><b>Average Flow Rate</b><span id="detAvg">—</span></div>
+<div class="detail"><b>Response</b><span id="detResponse">—</span></div>
+<div class="detail"><b>Packets</b><span id="detPackets">—</span></div>
+</div>
+</div>
+</section>
+
+<section id="alerts" class="page">
+<div class="header"><div><h1>Security Alerts</h1><p>Detected security events and recommended responses</p></div><button class="btn secondary" onclick="refreshAll()">Refresh</button></div>
+<div id="alertsContent"></div>
+<div class="card" style="margin-top:20px">
+<h2 class="section-title">Alert Interpretation</h2>
+<p class="small">Alerts are generated from the latest saved detection result. A controlled DDoS replay is used for the project demonstration; it does not represent an attack against an external system.</p>
+</div>
+</section>
+
+<section id="upload" class="page">
+<div class="header"><div><h1>Upload & Analyze</h1><p>Offline analysis workspace for traffic data</p></div></div>
+<div class="card">
+<h2 class="section-title">Select a traffic file</h2>
+<input id="fileInput" class="file-input" type="file" accept=".csv,.pcap,.pcapng">
+<p id="fileInfo" class="small">No file selected.</p>
+<div class="toolbar">
+<button class="btn" onclick="analyzeSelectedFile()">Analyze Selected File</button>
+<button class="btn secondary" onclick="useLatestResult()">Use Latest Detection Result</button>
+</div>
+<div id="uploadResult"></div>
+</div>
+<div class="card" style="margin-top:20px">
+<h2 class="section-title">Supported workflow</h2>
+<p class="small">Offline analysis supports CSV files containing the 14 network-flow features used by the trained XGBoost model. The uploaded file is validated, classified flow-by-flow, and summarized below. Raw PCAP/PCAPNG files are not automatically converted here; use the live TShark workflow for packet captures.</p>
+</div>
+</section>
+
+<section id="analytics" class="page">
+<div class="header"><div><h1>Analytics</h1><p>Summary of the latest traffic and detection measurements</p></div></div>
+<div class="grid two">
+<div class="card">
+<h2 class="section-title">Traffic Distribution</h2>
+<div class="bar-wrap"><div class="bar-label"><span>BENIGN flows</span><b id="analyticsBenign">—</b></div><div class="bar"><div id="benignBar" class="bar-fill" style="width:0%"></div></div></div>
+<div class="bar-wrap"><div class="bar-label"><span>DDoS flows</span><b id="analyticsDdos">—</b></div><div class="bar"><div id="ddosBar" class="bar-fill" style="width:0%"></div></div></div>
+</div>
+<div class="card">
+<h2 class="section-title">Current Risk</h2>
+<div class="metric" id="analyticsRisk">—</div>
+<p class="small" id="analyticsRiskText">Waiting for detection data.</p>
+</div>
+</div>
+<div class="card" style="margin-top:20px">
+<h2 class="section-title">Key Measurements</h2>
+<table><tbody>
+<tr><td>Peak flow rate</td><td id="analyticsPeak">—</td></tr>
+<tr><td>Average flow rate</td><td id="analyticsAvg">—</td></tr>
+<tr><td>Maximum DDoS probability</td><td id="analyticsProb">—</td></tr>
+<tr><td>Total packets</td><td id="analyticsPackets">—</td></tr>
+</tbody></table>
+</div>
+</section>
+
+<section id="history" class="page">
+<div class="header"><div><h1>Detection History</h1><p>Locally stored dashboard detection snapshots</p></div><button class="btn danger" onclick="clearHistory()">Clear History</button></div>
+<div class="card">
+<table><thead><tr><th>Time</th><th>Status</th><th>Risk</th><th>Probability</th><th>DDoS Flows</th><th>Response</th></tr></thead>
+<tbody id="historyTable"></tbody></table>
+</div>
+</section>
+
+<section id="logout" class="page">
+<div class="header"><div><h1>Session</h1><p>Local dashboard session</p></div></div>
+<div class="card">
+<h2 class="section-title">Logout</h2>
+<p>You are using the local DDoS Guard AI demonstration dashboard.</p>
+<button class="btn secondary" onclick="showPage('dashboard')">Return to Dashboard</button>
+</div>
+</section>
+
+</main>
+</div>
+
 <script>
+let latestTraffic = null;
+let latestDetection = null;
 
-async function loadTrafficData() {
+const navButtons = document.querySelectorAll(".nav-btn");
+navButtons.forEach(btn => btn.addEventListener("click", () => showPage(btn.dataset.page)));
 
-    try {
+function showPage(id){
+    document.querySelectorAll(".page").forEach(p => p.classList.remove("active"));
+    document.getElementById(id).classList.add("active");
+    navButtons.forEach(b => b.classList.toggle("active", b.dataset.page === id));
+    window.scrollTo({top:0,behavior:"smooth"});
+}
 
-        const response = await fetch(
-            "http://127.0.0.1:5000/traffic"
-        );
+async function fetchJSON(url){
+    const r = await fetch(url);
+    if(!r.ok) throw new Error("Request failed: " + r.status);
+    return await r.json();
+}
 
+async function loadTraffic(){
+    try{
+        const data = await fetchJSON("/traffic");
+        latestTraffic = data;
+        const total = Number(data.total_requests || 0);
+        const rps = Number(data.peak_rps || 0);
+        document.getElementById("totalRequests").textContent = total;
+        document.getElementById("requestsPerSecond").textContent = rps;
+        document.getElementById("dashRequests").textContent = total;
+        document.getElementById("dashIPs").textContent = data.unique_ips ?? 0;
+        document.getElementById("dashRPS").textContent = rps;
+        document.getElementById("liveRequests").textContent = total;
+        document.getElementById("liveRPS").textContent = rps;
+        document.getElementById("liveIPs").textContent = data.unique_ips ?? 0;
+        document.getElementById("liveResponse").textContent = (data.average_response_time ?? 0) + " s";
+        const width = Math.min(100, Math.max(3, rps * 3));
+        document.getElementById("activityBar").style.width = width + "%";
+        document.getElementById("activityText").textContent = rps + " req/s";
+        const tbody = document.getElementById("endpointTable");
+        tbody.innerHTML = "";
+        const counts = data.endpoint_counts || {};
+        Object.entries(counts).forEach(([endpoint,count])=>{
+            const share = total ? ((count/total)*100).toFixed(1) : "0.0";
+            tbody.innerHTML += `<tr><td>${escapeHTML(endpoint)}</td><td>${count}</td><td>${share}%</td></tr>`;
+        });
+    }catch(e){
+        console.error(e);
+    }
+}
+
+async function loadDetection(){
+    try{
+        const data = await fetchJSON("/detection");
+        latestDetection = data;
+        const ddos = Number(data.ddos_flows || 0);
+        const benign = Number(data.benign_flows || 0);
+        const total = Number(data.total_flows || 0);
+        const prob = Number(data.max_ddos_probability || 0);
+        document.getElementById("ddosAlerts").textContent = ddos;
+        document.getElementById("normalTraffic").textContent = benign;
+        document.getElementById("mlStatus").textContent = data.ml_status || "—";
+        document.getElementById("riskLevel").textContent = data.risk_level || "—";
+        document.getElementById("ddosProbability").textContent = prob + "%";
+        document.getElementById("responseAction").textContent = data.response || "—";
+        document.getElementById("detFlows").textContent = total;
+        document.getElementById("detBenign").textContent = benign;
+        document.getElementById("detDdos").textContent = ddos;
+        document.getElementById("detProb").textContent = prob + "%";
+        document.getElementById("detTraffic").textContent = data.traffic_status || "—";
+        document.getElementById("detRisk").textContent = data.risk_level || "—";
+        document.getElementById("detPeak").textContent = (data.peak_flow_rate ?? 0) + " packets/s";
+        document.getElementById("detAvg").textContent = (data.average_flow_rate ?? 0) + " packets/s";
+        document.getElementById("detResponse").textContent = data.response || "—";
+        document.getElementById("detPackets").textContent = data.total_packets ?? 0;
+
+        const banner = document.getElementById("detectionBanner");
+        banner.innerHTML = ddos > 0
+            ? `<div class="alert-box"><b>🚨 DDoS activity detected.</b><br>Latest result contains ${ddos} DDoS flow(s) with a maximum estimated probability of ${prob}%.</div>`
+            : `<div class="ok-box"><b>✅ No DDoS flows detected in the latest analyzed capture.</b><br>Maximum estimated DDoS probability: ${prob}%.</div>`;
+
+        document.getElementById("analyticsBenign").textContent = benign;
+        document.getElementById("analyticsDdos").textContent = ddos;
+        document.getElementById("benignBar").style.width = total ? (benign/total*100) + "%" : "0%";
+        document.getElementById("ddosBar").style.width = total ? (ddos/total*100) + "%" : "0%";
+        document.getElementById("analyticsRisk").textContent = data.risk_level || "—";
+        document.getElementById("analyticsRiskText").textContent = data.ml_status || "";
+        document.getElementById("analyticsPeak").textContent = (data.peak_flow_rate ?? 0) + " packets/s";
+        document.getElementById("analyticsAvg").textContent = (data.average_flow_rate ?? 0) + " packets/s";
+        document.getElementById("analyticsProb").textContent = prob + "%";
+        document.getElementById("analyticsPackets").textContent = data.total_packets ?? 0;
+
+        saveHistory(data);
+        renderAlerts(data);
+        renderHistory();
+    }catch(e){
+        console.error(e);
+        document.getElementById("detectionBanner").innerHTML = `<div class="alert-box"><b>Backend unavailable.</b><br>Start <code>python backend/app.py</code> and refresh.</div>`;
+    }
+}
+
+function renderAlerts(data){
+    const box = document.getElementById("alertsContent");
+    const ddos = Number(data.ddos_flows || 0);
+    if(ddos > 0){
+        box.innerHTML = `<div class="alert-box">
+            <h2 style="margin-top:0">🚨 DDoS Detection Alert</h2>
+            <p><b>Status:</b> ${escapeHTML(data.ml_status || "DDoS DETECTED")}</p>
+            <p><b>Risk:</b> ${escapeHTML(data.risk_level || "—")}</p>
+            <p><b>Maximum probability:</b> ${data.max_ddos_probability ?? 0}%</p>
+            <p><b>Affected flows:</b> ${ddos}</p>
+            <p><b>Recommended response:</b> ${escapeHTML(data.response || "MONITOR")}</p>
+        </div>`;
+    }else{
+        box.innerHTML = `<div class="ok-box"><h2 style="margin-top:0">✅ No active DDoS alert</h2><p>The latest analyzed traffic contains no DDoS-classified flows.</p></div>`;
+    }
+}
+
+function saveHistory(data){
+    const history = JSON.parse(localStorage.getItem("ddosHistory") || "[]");
+    const signature = JSON.stringify([
+        data.ml_status,data.risk_level,data.max_ddos_probability,
+        data.ddos_flows,data.total_flows,data.response
+    ]);
+    if(history.length && history[0].signature === signature) return;
+    history.unshift({
+        signature,
+        time:new Date().toLocaleString(),
+        status:data.ml_status || "—",
+        risk:data.risk_level || "—",
+        probability:data.max_ddos_probability ?? 0,
+        ddos:data.ddos_flows ?? 0,
+        response:data.response || "—"
+    });
+    localStorage.setItem("ddosHistory", JSON.stringify(history.slice(0,50)));
+}
+
+function renderHistory(){
+    const history = JSON.parse(localStorage.getItem("ddosHistory") || "[]");
+    const tbody = document.getElementById("historyTable");
+    tbody.innerHTML = history.length ? history.map(h=>`
+        <tr><td>${escapeHTML(h.time)}</td>
+        <td>${escapeHTML(h.status)}</td>
+        <td>${escapeHTML(h.risk)}</td>
+        <td>${h.probability}%</td>
+        <td>${h.ddos}</td>
+        <td>${escapeHTML(h.response)}</td></tr>`).join("")
+        : `<tr><td colspan="6" class="small">No history recorded yet.</td></tr>`;
+}
+
+function clearHistory(){
+    localStorage.removeItem("ddosHistory");
+    renderHistory();
+}
+
+async function analyzeSelectedFile(){
+    const file = document.getElementById("fileInput").files[0];
+    const result = document.getElementById("uploadResult");
+    if(!file){
+        result.innerHTML = `<div class="alert-box">Select a CSV file first.</div>`;
+        return;
+    }
+    if(!file.name.toLowerCase().endsWith(".csv")){
+        result.innerHTML = `<div class="alert-box"><b>Unsupported file.</b><br>Offline analysis currently accepts CSV files containing the 14 model features.</div>`;
+        return;
+    }
+    result.innerHTML = `<div class="ok-box">Analyzing <b>${escapeHTML(file.name)}</b>...</div>`;
+    try{
+        const form = new FormData();
+        form.append("file", file);
+        const response = await fetch("/analyze_csv", {method:"POST", body:form});
         const data = await response.json();
-
-        // Application-level traffic
-        document.getElementById(
-            "totalRequests"
-        ).textContent = data.total_requests;
-
-        document.getElementById(
-            "requestsPerSecond"
-        ).textContent = data.peak_rps;
-
+        if(!response.ok) throw new Error(data.error || "Analysis failed");
+        result.innerHTML = `
+        <div class="card" style="margin-top:16px;box-shadow:none;border:1px solid #e5e7eb">
+            <h2 class="section-title">Offline Analysis Result</h2>
+            <div class="grid cards">
+                <div class="card"><div class="metric-label">Total Flows</div><div class="metric">${data.total_flows}</div></div>
+                <div class="card"><div class="metric-label">BENIGN Flows</div><div class="metric green">${data.benign_flows}</div></div>
+                <div class="card"><div class="metric-label">DDoS Flows</div><div class="metric red">${data.ddos_flows}</div></div>
+                <div class="card"><div class="metric-label">Max DDoS Probability</div><div class="metric orange">${data.max_ddos_probability}%</div></div>
+            </div>
+            <div class="detail-grid" style="margin-top:16px">
+                <div class="detail"><b>ML Status</b><span>${escapeHTML(data.ml_status)}</span></div>
+                <div class="detail"><b>Risk Level</b><span>${escapeHTML(data.risk_level)}</span></div>
+                <div class="detail"><b>Peak Flow Rate</b><span>${data.peak_flow_rate} packets/s</span></div>
+                <div class="detail"><b>Average Flow Rate</b><span>${data.average_flow_rate} packets/s</span></div>
+                <div class="detail"><b>Response</b><span>${escapeHTML(data.response)}</span></div>
+                <div class="detail"><b>Rows Analyzed</b><span>${data.total_flows}</span></div>
+            </div>
+            <p class="small" style="margin-top:16px">File: ${escapeHTML(data.filename)}. Only the model-compatible 14 feature columns were used for prediction.</p>
+        </div>`;
+    }catch(e){
+        result.innerHTML = `<div class="alert-box"><b>Analysis failed.</b><br>${escapeHTML(e.message)}</div>`;
     }
-
-    catch (error) {
-
-        console.error(
-            "Unable to load traffic data:",
-            error
-        );
-
-    }
-
 }
 
-
-async function loadDetectionData() {
-
-    try {
-
-        const response = await fetch(
-            "http://127.0.0.1:5000/detection"
-        );
-
-        const data = await response.json();
-
-        // ML BENIGN flows
-        document.getElementById(
-            "normalTraffic"
-        ).textContent = data.benign_flows;
-
-        document.getElementById(
-    "trafficStatus"
-).textContent = data.traffic_status;
-
-const mlStatusElement =
-    document.getElementById("mlStatus");
-
-const riskElement =
-    document.getElementById("riskLevel");
-
-mlStatusElement.textContent =
-    data.ml_status;
-
-riskElement.textContent =
-    data.risk_level;
-
-
-// Reset status styles
-mlStatusElement.className = "";
-riskElement.className = "";
-
-
-// ML classification color
-if (data.ml_status === "BENIGN") {
-
-    mlStatusElement.classList.add(
-        "status-normal"
-    );
-
-}
-else {
-
-    mlStatusElement.classList.add(
-        "status-danger"
-    );
-
+function useLatestResult(){
+    showPage("detection");
+    loadDetection();
 }
 
+document.getElementById("fileInput").addEventListener("change",function(){
+    const f=this.files[0];
+    document.getElementById("fileInfo").textContent = f ? `${f.name} — ${(f.size/1024).toFixed(1)} KB` : "No file selected.";
+});
 
-// Risk level color
-if (data.risk_level === "LOW") {
-
-    riskElement.classList.add(
-        "status-normal"
-    );
-
-}
-else if (
-    data.risk_level === "MEDIUM" ||
-    data.risk_level === "HIGH"
-) {
-
-    riskElement.classList.add(
-        "status-warning"
-    );
-
-}
-else {
-
-    riskElement.classList.add(
-        "status-danger"
-    );
-
+function refreshAll(){
+    loadTraffic();
+    loadDetection();
 }
 
-document.getElementById(
-    "ddosProbability"
-).textContent =
-    data.max_ddos_probability + "%";
-
-document.getElementById(
-    "totalFlows"
-).textContent = data.total_flows;
-
-document.getElementById(
-    "benignFlows"
-).textContent = data.benign_flows;
-
-document.getElementById(
-    "ddosFlows"
-).textContent = data.ddos_flows;
-
-document.getElementById(
-    "peakFlowRate"
-).textContent =
-    data.peak_flow_rate + " packets/s";
-
-document.getElementById(
-    "averageFlowRate"
-).textContent =
-    data.average_flow_rate + " packets/s";
-
-document.getElementById(
-    "responseAction"
-).textContent = data.response;
-        // ML DDoS flows
-        document.getElementById(
-            "ddosAlerts"
-        ).textContent = data.ddos_flows;
-
-    }
-
-    catch (error) {
-
-        console.error(
-            "Unable to load detection data:",
-            error
-        );
-
-    }
-
+function escapeHTML(value){
+    return String(value).replace(/[&<>"']/g, c => ({
+        "&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#039;"
+    }[c]));
 }
 
-
-// Load data when dashboard opens
-loadTrafficData();
-loadDetectionData();
-
-
-// Refresh application traffic every 5 seconds
-setInterval(
-    loadTrafficData,
-    5000
-);
-
-
-// Refresh ML detection results every 5 seconds
-setInterval(
-    loadDetectionData,
-    5000
-);
-
+refreshAll();
+renderHistory();
+setInterval(loadTraffic,5000);
+setInterval(loadDetection,5000);
 </script>
 </body>
 </html>
