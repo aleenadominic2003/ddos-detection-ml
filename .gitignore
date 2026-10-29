@@ -5,3 +5,11 @@ __pycache__/
 *.log
 .ipynb_checkpoints/
 dataset/*.csv
+
+# Generated traffic captures and results
+demo_app/captures/
+demo_app/results/
+live_output.txt
+
+# Local backup files
+*_backup.py

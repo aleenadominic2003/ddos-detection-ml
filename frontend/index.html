@@ -1,0 +1,1464 @@
+<!DOCTYPE html>
+
+<html lang="en">
+
+<head>
+
+<meta charset="UTF-8">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>DDoS Guard AI</title>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+
+<style>
+
+
+:root{
+    --navy:#080d1a;
+    --navy2:#111a2e;
+    --blue:#38bdf8;
+    --blue2:#172554;
+    --bg:#080d1a;
+    --card:#111a2e;
+    --text:#e5eefc;
+    --muted:#94a3b8;
+    --green:#4ade80;
+    --red:#fb7185;
+    --orange:#fbbf24;
+    --border:#26344d;
+}
+
+
+*{box-sizing:border-box}
+
+body{margin:0;font-family:Segoe UI,Arial,sans-serif;background:var(--bg);color:var(--text)}
+
+.app{display:flex;min-height:100vh}
+
+
+.sidebar{width:250px;background:var(--navy);color:#fff;padding:22px 14px;position:fixed;left:0;top:0;bottom:0;overflow-y:auto;z-index:10}
+
+
+.brand{font-size:22px;font-weight:800;padding:10px 12px 28px}
+
+.brand span{color:#60a5fa}
+
+.nav{display:flex;flex-direction:column;gap:6px}
+
+.nav button{border:0;background:transparent;color:#cbd5e1;text-align:left;padding:13px 14px;border-radius:9px;font-size:15px;cursor:pointer}
+
+.nav button:hover,.nav button.active{background:#1e3a67;color:#fff}
+
+.main{margin-left:250px;width:calc(100% - 250px);padding:28px 34px}
+
+.page{display:none}
+
+.page.active{display:block}
+
+.header{display:flex;justify-content:space-between;align-items:center;margin-bottom:24px}
+
+.header h1{margin:0;font-size:27px}
+
+.header p{margin:5px 0 0;color:var(--muted)}
+
+
+.status-pill {
+    background: #123524;
+    color: #86efac;
+    border: 1px solid #166534;
+    padding: 8px 13px;
+    border-radius: 20px;
+    font-weight: 700;
+    font-size: 13px;
+}
+
+
+.grid{display:grid;gap:18px}
+
+.cards{grid-template-columns:repeat(4,1fr)}
+
+
+.card{
+    background:var(--card);
+    border:1px solid var(--border);
+    border-radius:14px;
+    padding:20px;
+    box-shadow:0 8px 24px rgba(0,0,0,.18);
+    transition:transform .2s ease,border-color .2s ease,box-shadow .2s ease;
+}
+.card:hover{
+    border-color:#3b82f6;
+    box-shadow:0 10px 28px rgba(0,0,0,.28);
+}
+
+
+.metric-label{color:var(--muted);font-size:14px;font-weight:600}
+
+.metric{font-size:30px;font-weight:800;margin-top:10px}
+
+.green{color:var(--green)}
+
+.red{color:var(--red)}
+
+.orange{color:var(--orange)}
+
+.blue{color:var(--blue)}
+
+.two{grid-template-columns:2fr 1fr;margin-top:20px}
+
+.section-title{font-size:18px;font-weight:800;margin:0 0 15px}
+
+
+.placeholder {
+    background: #0b1324;
+    color: var(--muted);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+}
+
+.detail {
+    background: #0b1324;
+    color: var(--text);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 14px;
+}
+
+.bar {
+    background: #26344d;
+    border-radius: 6px;
+}
+
+
+.detail-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+
+.detail {
+    padding: 11px 12px;
+    background: #0b1324;
+    color: var(--text);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+}
+
+.detail b{display:block;margin-bottom:4px}
+
+table{width:100%;border-collapse:collapse}
+
+th,td{padding:12px;border-bottom:1px solid var(--border);text-align:left;font-size:14px}
+
+
+th{
+    color:var(--muted);
+    font-size:12px;
+    text-transform:uppercase;
+    background:#0b1324;
+}
+td{
+    color:var(--text);
+}
+tr:hover td{
+    background:#17243a;
+}
+
+
+.badge{display:inline-block;padding:5px 9px;border-radius:15px;font-size:12px;font-weight:700}
+
+
+.badge.green {
+    background: #123524;
+    color: #86efac;
+}
+
+.badge.red {
+    background: #451a24;
+    color: #fda4af;
+}
+
+.badge.orange {
+    background: #422c12;
+    color: #fcd34d;
+}
+
+.badge.blue {
+    background: #142d4d;
+    color: #93c5fd;
+}
+
+
+.btn{border:0;border-radius:8px;padding:11px 16px;font-weight:700;cursor:pointer;background:var(--blue);color:#fff}
+
+
+.btn.secondary {
+    background: #1e293b;
+    color: #e5eefc;
+    border: 1px solid #334155;
+}
+
+.btn.secondary:hover {
+    background: #26344d;
+}
+
+
+.btn.danger{background:var(--red)}
+
+.toolbar{display:flex;gap:10px;flex-wrap:wrap;margin-bottom:18px}
+
+.stat-row{display:grid;grid-template-columns:repeat(3,1fr);gap:15px}
+
+.bar-wrap{margin:16px 0}
+
+.bar-label{display:flex;justify-content:space-between;font-size:13px;margin-bottom:6px}
+
+.bar{height:14px;background:#e2e8f0;border-radius:10px;overflow:hidden}
+
+.bar-fill{height:100%;background:var(--blue);border-radius:10px}
+
+
+.alert-box {
+    background: #351722;
+    color: #fecdd3;
+    border: 1px solid #9f1239;
+    border-radius: 10px;
+    padding: 12px;
+}
+
+.ok-box {
+    background: #102c24;
+    color: #bbf7d0;
+    border: 1px solid #166534;
+    border-radius: 10px;
+    padding: 12px;
+}
+
+
+.ok-box {
+    border-left: 5px solid var(--green);
+    background: #102c24;
+    color: #bbf7d0;
+    border-top: 1px solid #166534;
+    border-right: 1px solid #166534;
+    border-bottom: 1px solid #166534;
+    padding: 16px;
+    border-radius: 8px;
+}
+
+
+.file-input {
+    background: #0b1324;
+    color: var(--text);
+    border: 1px dashed #475569;
+    border-radius: 10px;
+    padding: 14px;
+}
+
+input:not([type="checkbox"]):not([type="radio"]),
+select,
+textarea {
+    background: #0b1324;
+    color: var(--text);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+}
+
+input::placeholder,
+textarea::placeholder {
+    color: #94a3b8;
+}
+
+input:focus,
+select:focus,
+textarea:focus {
+    outline: none;
+    border-color: #38bdf8;
+    box-shadow: 0 0 0 2px rgba(56, 189, 248, 0.15);
+}
+
+
+
+.small{font-size:13px;color:var(--muted)}
+
+@media(max-width:900px){
+
+ .sidebar{width:190px}.main{margin-left:190px;width:calc(100% - 190px);padding:20px}
+
+ .cards{grid-template-columns:repeat(2,1fr)}.two{grid-template-columns:1fr}
+
+}
+
+@media(max-width:650px){
+
+ .sidebar{position:relative;width:100%;height:auto}.app{display:block}.main{margin-left:0;width:100%}.cards{grid-template-columns:1fr}
+
+}
+
+
+/* Admin login */
+#loginScreen{min-height:100vh;display:flex;align-items:center;justify-content:center;padding:24px;background:radial-gradient(circle at 15% 15%,#244779 0,transparent 32%),linear-gradient(135deg,#0b1220,#14243d 60%,#0b1220);font-family:Segoe UI,Arial,sans-serif}
+.login-shell{width:min(100%,960px);display:grid;grid-template-columns:1.05fr .95fr;background:#fff;border-radius:24px;overflow:hidden;box-shadow:0 28px 90px rgba(0,0,0,.35)}
+.login-hero{padding:52px 42px;background:linear-gradient(145deg,#101827,#1e3a67);color:#fff;display:flex;flex-direction:column;justify-content:space-between;min-height:470px}
+.login-logo{font-size:24px;font-weight:800;letter-spacing:.3px}.login-logo span{color:#60a5fa}
+.login-hero h1{font-size:36px;line-height:1.15;margin:54px 0 16px}.login-hero p{color:#cbd5e1;line-height:1.7}
+.login-feature{margin-top:26px;padding:14px 16px;border:1px solid rgba(255,255,255,.15);border-radius:12px;background:rgba(255,255,255,.05);color:#dbeafe;font-size:14px}
+.login-form-panel{padding:52px 42px;display:flex;flex-direction:column;justify-content:center}
+.login-form-panel h2{margin:0 0 8px;font-size:27px;color:#172033}.login-subtitle{margin:0 0 28px;color:#64748b;line-height:1.5}
+.login-label{display:block;font-size:13px;font-weight:700;color:#334155;margin:16px 0 8px}
+.login-input{width:100%;box-sizing:border-box;border:1px solid #cbd5e1;border-radius:10px;padding:13px 14px;font:inherit;outline:none;transition:border .2s,box-shadow .2s}
+
+.login-input:focus{border-color:#2563eb;box-shadow:0 0 0 3px rgba(37,99,235,.12)}
+.login-submit{width:100%;margin-top:24px;border:0;border-radius:10px;padding:14px;background:linear-gradient(90deg,#2563eb,#3b82f6);color:#fff;font-weight:800;font-size:15px;cursor:pointer;box-shadow:0 8px 18px rgba(37,99,235,.2)}
+.login-submit:hover{filter:brightness(1.06);transform:translateY(-1px)}
+.login-error{display:none;margin-top:16px;padding:12px;border-radius:9px;background:#fee2e2;color:#991b1b;font-size:13px}
+.login-foot{margin-top:22px;font-size:12px;color:#94a3b8;text-align:center}
+#loginLoading{color:#cbd5e1;font-size:12px;margin-top:24px}
+.header-actions{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+.logout-top{border:1px solid #cbd5e1;background:#fff;color:#334155;border-radius:9px;padding:9px 12px;font-weight:700;cursor:pointer}
+@media(max-width:700px){.login-shell{grid-template-columns:1fr}.login-hero{min-height:auto;padding:30px}.login-hero h1{font-size:29px;margin:30px 0 12px}.login-form-panel{padding:32px 26px}.login-feature{margin-top:18px}}
+
+</style>
+
+</head>
+
+<body>
+
+
+<div id="loginScreen">
+  <div class="login-shell">
+    <section class="login-hero">
+      <div>
+        <div class="login-logo">🛡️ DDOS <span>GUARD AI</span></div>
+        <h1>Security starts with visibility.</h1>
+        <p>Monitor network-flow predictions, review traffic activity, and investigate suspicious patterns from one protected workspace.</p>
+      </div>
+      <div>
+        <div class="login-feature">◉ &nbsp; Machine-learning powered DDoS detection</div>
+        <div class="login-feature">◉ &nbsp; Live traffic monitoring and alert review</div>
+        <div id="loginLoading">SECURE ADMIN ACCESS</div>
+      </div>
+    </section>
+    <section class="login-form-panel">
+      <h2>Welcome back</h2>
+      <p class="login-subtitle">Sign in with your administrator account to open the dashboard.</p>
+      <form id="loginForm">
+        <label class="login-label" for="loginUsername">Admin username</label>
+        <input class="login-input" id="loginUsername" name="username" autocomplete="username" required placeholder="Enter username">
+        <label class="login-label" for="loginPassword">Password</label>
+        <input class="login-input" id="loginPassword" name="password" type="password" autocomplete="current-password" required placeholder="Enter password">
+        <button class="login-submit" id="loginSubmit" type="submit">Sign in to dashboard &nbsp; →</button>
+        <div class="login-error" id="loginError" role="alert"></div>
+      </form>
+      <div class="login-foot">DDoS Guard AI · Administrator Portal</div>
+    </section>
+  </div>
+</div>
+
+<div class="app" id="dashboardApp" style="display:none">
+
+<aside class="sidebar">
+
+    <div class="brand">🛡️ DDOS <span>GUARD AI</span></div>
+
+    <nav class="nav">
+
+        <button class="nav-btn active" data-page="dashboard">🏠 Dashboard</button>
+
+        <button class="nav-btn" data-page="live">📡 Live Monitoring</button>
+
+        <button class="nav-btn" data-page="detection">🤖 Detection</button>
+
+        <button class="nav-btn" data-page="alerts">🚨 Alerts</button>
+
+        <button class="nav-btn" data-page="upload">📁 Upload & Analyze</button>
+
+        <button class="nav-btn" data-page="analytics">📊 Analytics</button>
+
+        <button class="nav-btn" data-page="history">📜 History</button>
+
+        <button class="nav-btn" data-page="logout">🚪 Logout</button>
+
+    </nav>
+
+</aside>
+
+
+
+<main class="main">
+
+
+
+<section id="dashboard" class="page active">
+
+<div class="header">
+
+<div><h1>Security Dashboard</h1><p>Machine learning based DDoS traffic monitoring</p></div>
+
+<div class="status-pill">● SYSTEM ONLINE</div>
+
+</div>
+
+<div class="grid cards">
+
+<div class="card"><div class="metric-label">Total Requests</div><div id="totalRequests" class="metric">—</div></div>
+
+<div class="card"><div class="metric-label">Requests / Second</div><div id="requestsPerSecond" class="metric">—</div></div>
+
+<div class="card"><div class="metric-label">Normal Traffic</div><div id="normalTraffic" class="metric green">—</div></div>
+
+<div class="card"><div class="metric-label">DDoS Alerts</div><div id="ddosAlerts" class="metric red">—</div></div>
+
+</div>
+
+
+
+<div class="grid two">
+
+<div class="card">
+
+<h2 class="section-title">Live Traffic Monitoring</h2>
+
+<div style="height:280px; position:relative;">
+    <canvas id="trafficChart"></canvas>
+</div>
+
+
+<div class="stat-row">
+
+<div><div class="small">Total Requests</div><b id="dashRequests">—</b></div>
+
+<div><div class="small">Unique IPs</div><b id="dashIPs">—</b></div>
+
+<div><div class="small">Peak RPS</div><b id="dashRPS">—</b></div>
+<div>
+    <div class="small">Live RPS</div>
+    <b id="dashLiveRPS">0</b>
+</div>
+
+</div>
+
+<div style="margin-top:20px" class="bar-wrap">
+
+<div class="bar-label"><span>Current request activity</span><b id="activityText">—</b></div>
+<div style="margin-top:10px">
+    <span class="small">Traffic Status: </span>
+    <b id="trafficStatus">Idle</b>
+</div>
+<div class="small" style="margin-top:6px; line-height:1.6">
+    Idle: 0 req/s |
+    Normal: 0–0.99 req/s |
+    High: ≥1 req/s
+</div>
+<div id="trafficWarning" class="alert-box" style="display:none; margin-top:10px">
+    ⚠️ High traffic detected. Review the live traffic and ML detection results.
+</div>
+<div class="bar"><div id="activityBar" class="bar-fill" style="width:0%"></div></div>
+
+</div>
+
+</div>
+
+
+
+<div class="card">
+
+<h2 class="section-title">ML-Based DDoS Detection</h2>
+
+<div style="height:240px; position:relative; margin-bottom:16px;">
+    <canvas id="detectionChart"></canvas>
+</div>
+<h3 class="section-title">Detection History</h3>
+
+<div style="height:260px; position:relative; margin-bottom:16px;">
+    <canvas id="detectionHistoryChart"></canvas>
+</div>
+
+
+<div class="detail-grid">
+
+<div class="detail"><b>ML Status</b><span id="mlStatus">—</span></div>
+
+<div class="detail"><b>Risk Level</b><span id="riskLevel">—</span></div>
+
+<div class="detail"><b>DDoS Probability</b><span id="ddosProbability">—</span></div>
+
+<div class="detail"><b>Response</b><span id="responseAction">—</span></div>
+
+</div>
+
+</div>
+
+</div>
+
+</section>
+
+
+
+<section id="live" class="page">
+
+<div class="header"><div><h1>Live Monitoring</h1><p>Application traffic statistics from the protected demo application</p></div></div>
+
+<div class="grid cards">
+
+<div class="card"><div class="metric-label">Total Requests</div><div id="liveRequests" class="metric">—</div></div>
+
+<div class="card"><div class="metric-label">Peak Requests / Second</div><div id="liveRPS" class="metric blue">—</div></div>
+
+<div class="card"><div class="metric-label">Unique IPs</div><div id="liveIPs" class="metric">—</div></div>
+
+<div class="card"><div class="metric-label">Avg Response Time</div><div id="liveResponse" class="metric">—</div></div>
+
+</div>
+
+<div class="card" style="margin-top:20px">
+
+<h2 class="section-title">Endpoint Activity</h2>
+
+<table><thead><tr><th>Endpoint</th><th>Requests</th><th>Share</th></tr></thead><tbody id="endpointTable"></tbody></table>
+
+</div>
+
+</section>
+
+
+
+<section id="detection" class="page">
+
+<div class="header"><div><h1>ML Detection</h1><p>Latest XGBoost network-flow classification</p></div><button class="btn" onclick="refreshAll()">Refresh Detection</button></div>
+
+<div id="detectionBanner"></div>
+
+<div class="grid cards" style="margin-top:18px">
+
+<div class="card"><div class="metric-label">Total Flows</div><div id="detFlows" class="metric">—</div></div>
+
+<div class="card"><div class="metric-label">BENIGN Flows</div><div id="detBenign" class="metric green">—</div></div>
+
+<div class="card"><div class="metric-label">DDoS Flows</div><div id="detDdos" class="metric red">—</div></div>
+
+<div class="card"><div class="metric-label">Maximum DDoS Probability</div><div id="detProb" class="metric orange">—</div></div>
+
+</div>
+
+<div class="card" style="margin-top:20px">
+
+<h2 class="section-title">Detection Details</h2>
+
+<div class="detail-grid">
+
+<div class="detail"><b>Traffic Status</b><span id="detTraffic">—</span></div>
+
+<div class="detail"><b>Risk Level</b><span id="detRisk">—</span></div>
+
+<div class="detail"><b>Peak Flow Rate</b><span id="detPeak">—</span></div>
+
+<div class="detail"><b>Average Flow Rate</b><span id="detAvg">—</span></div>
+
+<div class="detail"><b>Response</b><span id="detResponse">—</span></div>
+
+<div class="detail"><b>Packets</b><span id="detPackets">—</span></div>
+
+</div>
+
+</div>
+
+</section>
+
+
+
+<section id="alerts" class="page">
+
+<div class="header"><div><h1>Security Alerts</h1><p>Detected security events and recommended responses</p></div><button class="btn secondary" onclick="refreshAll()">Refresh</button></div>
+
+<div id="alertsContent"></div>
+
+<div class="card" style="margin-top:20px">
+
+<h2 class="section-title">Alert Interpretation</h2>
+
+<p class="small">Alerts are generated from the latest saved detection result. A controlled DDoS replay is used for the project demonstration; it does not represent an attack against an external system.</p>
+
+</div>
+
+</section>
+
+
+
+<section id="upload" class="page">
+
+<div class="header"><div><h1>Upload & Analyze</h1><p>Offline analysis workspace for traffic data</p></div></div>
+
+<div class="card">
+
+<h2 class="section-title">Select a traffic file</h2>
+
+<input id="fileInput" class="file-input" type="file" accept=".csv,.pcap,.pcapng">
+
+<p id="fileInfo" class="small">No file selected.</p>
+
+<div class="toolbar">
+
+<button class="btn" onclick="analyzeSelectedFile()">Analyze Selected File</button>
+
+<button class="btn secondary" onclick="useLatestResult()">Use Latest Detection Result</button>
+
+</div>
+
+<div id="uploadResult"></div>
+
+</div>
+
+<div class="card" style="margin-top:20px">
+
+<h2 class="section-title">Supported workflow</h2>
+
+<p class="small">Offline analysis supports CSV files containing the 14 network-flow features used by the trained XGBoost model. The uploaded file is validated, classified flow-by-flow, and summarized below. Raw PCAP/PCAPNG files are not automatically converted here; use the live TShark workflow for packet captures.</p>
+
+</div>
+
+</section>
+
+
+
+<section id="analytics" class="page">
+
+<div class="header"><div><h1>Analytics</h1><p>Summary of the latest traffic and detection measurements</p></div></div>
+
+<div class="grid two">
+
+<div class="card">
+
+<h2 class="section-title">Traffic Distribution</h2>
+
+<div class="bar-wrap"><div class="bar-label"><span>BENIGN flows</span><b id="analyticsBenign">—</b></div><div class="bar"><div id="benignBar" class="bar-fill" style="width:0%"></div></div></div>
+
+<div class="bar-wrap"><div class="bar-label"><span>DDoS flows</span><b id="analyticsDdos">—</b></div><div class="bar"><div id="ddosBar" class="bar-fill" style="width:0%"></div></div></div>
+
+</div>
+
+<div class="card">
+
+<h2 class="section-title">Current Risk</h2>
+
+<div class="metric" id="analyticsRisk">—</div>
+
+<p class="small" id="analyticsRiskText">Waiting for detection data.</p>
+
+</div>
+
+</div>
+
+<div class="card" style="margin-top:20px">
+
+<h2 class="section-title">Key Measurements</h2>
+
+<table><tbody>
+
+<tr><td>Peak flow rate</td><td id="analyticsPeak">—</td></tr>
+
+<tr><td>Average flow rate</td><td id="analyticsAvg">—</td></tr>
+
+<tr><td>Maximum DDoS probability</td><td id="analyticsProb">—</td></tr>
+
+<tr><td>Total packets</td><td id="analyticsPackets">—</td></tr>
+
+</tbody></table>
+
+</div>
+
+</section>
+
+
+
+<section id="history" class="page">
+
+<div class="header"><div><h1>Detection History</h1><p>Locally stored dashboard detection snapshots</p></div><button class="btn danger" onclick="clearHistory()">Clear History</button></div>
+
+<div class="card">
+
+<table><thead><tr><th>Time</th><th>Status</th><th>Risk</th><th>Probability</th><th>DDoS Flows</th><th>Response</th></tr></thead>
+
+<tbody id="historyTable"></tbody></table>
+
+</div>
+
+</section>
+
+
+
+<section id="logout" class="page">
+
+<div class="header"><div><h1>Session</h1><p>Local dashboard session</p></div></div>
+
+<div class="card">
+
+<h2 class="section-title">Logout</h2>
+
+<p>You are using the local DDoS Guard AI demonstration dashboard.</p>
+
+<button class="btn danger" onclick="performLogout()">Log out securely</button>
+
+</div>
+
+</section>
+
+
+
+</main>
+
+</div>
+
+
+
+<script>
+
+let latestTraffic = null;
+
+let detectionChart = null;
+let detectionHistoryChart = null;
+let detectionHistory = [];
+localStorage.removeItem("ddosDetectionHistory");
+function updateDetectionHistoryChart(benign, ddos) {
+    initializeDetectionHistoryChart();
+
+    if (!detectionHistoryChart) return;
+
+    const now = new Date().toLocaleTimeString();
+
+    detectionHistory.push({
+        time: now,
+        benign: benign,
+        ddos: ddos
+    });
+
+    // Keep only the latest 20 measurements.
+    if (detectionHistory.length > 20) {
+        detectionHistory.shift();
+    }
+    localStorage.setItem(
+    "ddosDetectionHistory",
+    JSON.stringify(detectionHistory)
+);
+    detectionHistoryChart.data.labels =
+        detectionHistory.map(item => item.time);
+
+    detectionHistoryChart.data.datasets[0].data =
+        detectionHistory.map(item => item.benign);
+
+    detectionHistoryChart.data.datasets[1].data =
+        detectionHistory.map(item => item.ddos);
+
+    detectionHistoryChart.update();
+}
+
+function initializeDetectionHistoryChart() {
+    const canvas = document.getElementById("detectionHistoryChart");
+
+    if (!canvas || typeof Chart === "undefined") {
+        console.error("Detection history canvas or Chart.js is unavailable.");
+        return;
+    }
+
+    if (detectionHistoryChart) return;
+
+    detectionHistoryChart = new Chart(canvas, {
+        type: "line",
+        data: {
+            labels: [],
+            datasets: [
+                {
+                    label: "BENIGN Flows",
+                    data: [],
+                    borderColor: "#4ade80",
+                    backgroundColor: "rgba(74, 222, 128, 0.10)",
+                    tension: 0.3
+                },
+                {
+                    label: "DDoS Flows",
+                    data: [],
+                    borderColor: "#fb7185",
+                    backgroundColor: "rgba(251, 113, 133, 0.10)",
+                    tension: 0.3
+                }
+            ]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            animation: false,
+            plugins: {
+                legend: {
+                    labels: { color: "#e5eefc" }
+                }
+            },
+            scales: {
+                x: {
+                    ticks: { color: "#94a3b8" },
+                    grid: { color: "#26344d" }
+                },
+                y: {
+                    beginAtZero: true,
+                    ticks: { color: "#94a3b8" },
+                    grid: { color: "#26344d" }
+                }
+            }
+        }
+    });
+}
+
+function initializeDetectionChart() {
+    const canvas = document.getElementById("detectionChart");
+
+    if (!canvas || typeof Chart === "undefined") {
+        console.error("Detection chart or Chart.js is unavailable.");
+        return;
+    }
+
+    if (detectionChart) return;
+
+    detectionChart = new Chart(canvas, {
+        type: "doughnut",
+        data: {
+            labels: ["BENIGN Flows", "DDoS Flows"],
+            datasets: [{
+                data: [0, 0],
+                backgroundColor: ["#4ade80", "#fb7185"],
+                borderColor: ["#111a2e", "#111a2e"],
+                borderWidth: 3
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                legend: {
+                    position: "bottom",
+                    labels: {
+                        color: "#e5eefc",
+                        padding: 18
+                    }
+                }
+            }
+        }
+    });
+}
+
+function updateDetectionChart(benign, ddos) {
+    initializeDetectionChart();
+
+    if (!detectionChart) return;
+
+    detectionChart.data.datasets[0].data = [benign, ddos];
+    detectionChart.update();
+}
+
+let trafficChart = null;
+
+function initializeTrafficChart() {
+    const canvas = document.getElementById("trafficChart");
+
+    if (!canvas || typeof Chart === "undefined") {
+        console.error("Chart.js or traffic chart canvas is unavailable.");
+        return;
+    }
+
+    if (trafficChart) return;
+
+    trafficChart = new Chart(canvas, {
+        type: "line",
+        data: {
+            labels: [],
+            datasets: [{
+                label: "Requests per second",
+                data: [],
+                borderColor: "#38bdf8",
+                backgroundColor: "rgba(56, 189, 248, 0.12)",
+                fill: true,
+                tension: 0.35,
+                pointRadius: 3
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            animation: false,
+            plugins: {
+                legend: {
+                    labels: {
+                        color: "#e5eefc"
+                    }
+                }
+            },
+            scales: {
+                x: {
+                    ticks: { color: "#94a3b8" },
+                    grid: { color: "#26344d" }
+                },
+                y: {
+                    beginAtZero: true,
+                    ticks: { color: "#94a3b8" },
+                    grid: { color: "#26344d" }
+                }
+            }
+        }
+    });
+}
+
+function updateTrafficChart(requestsPerSecond) {
+    initializeTrafficChart();
+
+    if (!trafficChart) return;
+
+    const now = new Date().toLocaleTimeString();
+
+    trafficChart.data.labels.push(now);
+    trafficChart.data.datasets[0].data.push(requestsPerSecond);
+
+    // Keep only the latest 20 measurements.
+    if (trafficChart.data.labels.length > 20) {
+        trafficChart.data.labels.shift();
+        trafficChart.data.datasets[0].data.shift();
+    }
+
+    trafficChart.update();
+}
+
+let latestDetection = null;
+
+
+
+const navButtons = document.querySelectorAll(".nav-btn");
+
+navButtons.forEach(btn => btn.addEventListener("click", () => {
+    if (btn.dataset.page === "logout") {
+        performLogout();
+    } else {
+        showPage(btn.dataset.page);
+    }
+}));
+
+
+
+function showPage(id){
+
+    document.querySelectorAll(".page").forEach(p => p.classList.remove("active"));
+
+    document.getElementById(id).classList.add("active");
+
+    navButtons.forEach(b => b.classList.toggle("active", b.dataset.page === id));
+
+    window.scrollTo({top:0,behavior:"smooth"});
+
+}
+
+
+
+async function fetchJSON(url){
+
+    const r = await fetch(url);
+
+    if(!r.ok) throw new Error("Request failed: " + r.status);
+
+    return await r.json();
+
+}
+
+
+
+
+function showLogin(){
+    document.getElementById("loginScreen").style.display = "flex";
+    document.getElementById("dashboardApp").style.display = "none";
+}
+function showDashboard(){
+    document.getElementById("loginScreen").style.display = "none";
+    document.getElementById("dashboardApp").style.display = "flex";
+    refreshAll();
+    renderHistory();
+}
+async function checkAuth(){
+    try{
+        const response = await fetch("/auth/status", {credentials:"same-origin"});
+        const data = await response.json();
+        if(data.logged_in){ showDashboard(); } else { showLogin(); }
+    }catch(error){
+        showLogin();
+        showLoginError("Could not connect to the backend. Make sure python backend/app.py is running.");
+    }
+}
+function showLoginError(message){
+    const errorBox = document.getElementById("loginError");
+    errorBox.textContent = message;
+    errorBox.style.display = "block";
+}
+document.getElementById("loginForm").addEventListener("submit", async function(event){
+    event.preventDefault();
+    const button = document.getElementById("loginSubmit");
+    const errorBox = document.getElementById("loginError");
+    errorBox.style.display = "none";
+    button.disabled = true;
+    button.textContent = "Signing in...";
+    try{
+        const response = await fetch("/login", {
+            method:"POST",
+            headers:{"Content-Type":"application/json"},
+            credentials:"same-origin",
+            body:JSON.stringify({
+                username:document.getElementById("loginUsername").value.trim(),
+                password:document.getElementById("loginPassword").value
+            })
+        });
+        const data = await response.json();
+        if(!response.ok) throw new Error(data.error || "Login failed.");
+        document.getElementById("loginPassword").value = "";
+        showDashboard();
+    }catch(error){
+        showLoginError(error.message || "Unable to sign in.");
+    }finally{
+        button.disabled = false;
+        button.textContent = "Sign in to dashboard  →";
+    }
+});
+async function performLogout(){
+    try{
+        await fetch("/logout", {method:"POST", credentials:"same-origin"});
+    }finally{
+        showLogin();
+        document.getElementById("loginPassword").value = "";
+        document.getElementById("loginUsername").value = "";
+        document.getElementById("loginError").style.display = "none";
+    }
+}
+
+async function loadTraffic(){
+
+    try{
+
+        const data = await fetchJSON("/traffic");
+
+        latestTraffic = data;
+
+        const total = Number(data.total_requests || 0);
+
+        const rps = Number(data.recent_rps || 0);
+const statusElement = document.getElementById("trafficStatus");
+
+if (statusElement) {
+    if (rps === 0) {
+        statusElement.textContent = "Idle";
+        statusElement.style.color = "#94a3b8";
+    } else if (rps < 1) {
+        statusElement.textContent = "Normal Traffic";
+        statusElement.style.color = "#4ade80";
+    } else {
+        statusElement.textContent = "High Traffic";
+        statusElement.style.color = "#fbbf24";
+    }
+    const warningElement = document.getElementById("trafficWarning");
+
+if (warningElement) {
+    warningElement.style.display = rps >= 1 ? "block" : "none";
+}
+}
+const peakRps = Number(data.peak_rps || 0);
+document.getElementById("dashLiveRPS").textContent = rps;
+updateTrafficChart(rps);
+
+        document.getElementById("totalRequests").textContent = total;
+
+        document.getElementById("requestsPerSecond").textContent = rps;
+
+        document.getElementById("dashRequests").textContent = total;
+
+        document.getElementById("dashIPs").textContent = data.unique_ips ?? 0;
+
+        document.getElementById("dashRPS").textContent = peakRps;
+
+        document.getElementById("liveRequests").textContent = total;
+
+        document.getElementById("liveRPS").textContent = rps;
+
+        document.getElementById("liveIPs").textContent = data.unique_ips ?? 0;
+
+        document.getElementById("liveResponse").textContent = (data.average_response_time ?? 0) + " s";
+
+        const width = Math.min(100, Math.max(3, rps * 3));
+
+        document.getElementById("activityBar").style.width = width + "%";
+
+        document.getElementById("activityText").textContent = rps + " req/s";
+
+        const tbody = document.getElementById("endpointTable");
+
+        tbody.innerHTML = "";
+
+        const counts = data.endpoint_counts || {};
+
+        Object.entries(counts).forEach(([endpoint,count])=>{
+
+            const share = total ? ((count/total)*100).toFixed(1) : "0.0";
+
+            tbody.innerHTML += `<tr><td>${escapeHTML(endpoint)}</td><td>${count}</td><td>${share}%</td></tr>`;
+
+        });
+
+    }catch(e){
+
+        console.error(e);
+
+    }
+
+}
+
+
+
+async function loadDetection(){
+
+    try{
+
+        const data = await fetchJSON("/detection");
+
+        latestDetection = data;
+
+        const ddos = Number(data.ddos_flows || 0);
+
+        const benign = Number(data.benign_flows || 0);
+
+        const total = Number(data.total_flows || 0);
+updateDetectionChart(benign, ddos);
+updateDetectionHistoryChart(benign, ddos);
+
+        const prob = Number(data.max_ddos_probability || 0);
+
+        document.getElementById("ddosAlerts").textContent = ddos;
+
+        document.getElementById("normalTraffic").textContent = benign;
+
+        document.getElementById("mlStatus").textContent = data.ml_status || "—";
+
+        document.getElementById("riskLevel").textContent = data.risk_level || "—";
+
+        document.getElementById("ddosProbability").textContent = prob + "%";
+
+        document.getElementById("responseAction").textContent = data.response || "—";
+
+        document.getElementById("detFlows").textContent = total;
+
+        document.getElementById("detBenign").textContent = benign;
+
+        document.getElementById("detDdos").textContent = ddos;
+
+        document.getElementById("detProb").textContent = prob + "%";
+
+        document.getElementById("detTraffic").textContent = data.traffic_status || "—";
+
+        document.getElementById("detRisk").textContent = data.risk_level || "—";
+
+        document.getElementById("detPeak").textContent = (data.peak_flow_rate ?? 0) + " packets/s";
+
+        document.getElementById("detAvg").textContent = (data.average_flow_rate ?? 0) + " packets/s";
+
+        document.getElementById("detResponse").textContent = data.response || "—";
+
+        document.getElementById("detPackets").textContent = data.total_packets ?? 0;
+
+
+
+        const banner = document.getElementById("detectionBanner");
+
+        banner.innerHTML = ddos > 0
+
+            ? `<div class="alert-box"><b>🚨 DDoS activity detected.</b><br>This session has recorded ${ddos} DDoS flow(s). Maximum estimated DDoS probability: ${prob}%.</div>`
+
+            : `<div class="ok-box"><b>✅ No DDoS flows detected in the latest analyzed capture.</b><br>Maximum estimated DDoS probability: ${prob}%.</div>`;
+
+
+
+        document.getElementById("analyticsBenign").textContent = benign;
+
+        document.getElementById("analyticsDdos").textContent = ddos;
+
+        document.getElementById("benignBar").style.width = total ? (benign/total*100) + "%" : "0%";
+
+        document.getElementById("ddosBar").style.width = total ? (ddos/total*100) + "%" : "0%";
+
+        document.getElementById("analyticsRisk").textContent = data.risk_level || "—";
+
+        document.getElementById("analyticsRiskText").textContent = data.ml_status || "";
+
+        document.getElementById("analyticsPeak").textContent = (data.peak_flow_rate ?? 0) + " packets/s";
+
+        document.getElementById("analyticsAvg").textContent = (data.average_flow_rate ?? 0) + " packets/s";
+
+        document.getElementById("analyticsProb").textContent = prob + "%";
+
+        document.getElementById("analyticsPackets").textContent = data.total_packets ?? 0;
+
+
+
+        saveHistory(data);
+
+        renderAlerts(data);
+
+        renderHistory();
+
+    }catch(e){
+
+        console.error(e);
+
+        document.getElementById("detectionBanner").innerHTML = `<div class="alert-box"><b>Backend unavailable.</b><br>Start <code>python backend/app.py</code> and refresh.</div>`;
+
+    }
+
+}
+
+
+
+function renderAlerts(data){
+
+    const box = document.getElementById("alertsContent");
+
+    const ddos = Number(data.ddos_flows || 0);
+
+    if(ddos > 0){
+
+        box.innerHTML = `<div class="alert-box">
+
+            <h2 style="margin-top:0">🚨 DDoS Detection Alert</h2>
+
+            <p><b>Status:</b> ${escapeHTML(data.ml_status || "DDoS DETECTED")}</p>
+
+            <p><b>Risk:</b> ${escapeHTML(data.risk_level || "—")}</p>
+
+            <p><b>Maximum probability:</b> ${data.max_ddos_probability ?? 0}%</p>
+
+            <p><b>Affected flows:</b> ${ddos}</p>
+
+            <p><b>Recommended response:</b> ${escapeHTML(data.response || "MONITOR")}</p>
+
+        </div>`;
+
+    }else{
+
+        box.innerHTML = `<div class="ok-box"><h2 style="margin-top:0">✅ No active DDoS alert</h2><p>The latest analyzed traffic contains no DDoS-classified flows.</p></div>`;
+
+    }
+
+}
+
+
+
+function saveHistory(data){
+
+    const history = JSON.parse(localStorage.getItem("ddosHistory") || "[]");
+
+    const signature = JSON.stringify([
+
+        data.ml_status,data.risk_level,data.max_ddos_probability,
+
+        data.ddos_flows,data.total_flows,data.response
+
+    ]);
+
+    if(history.length && history[0].signature === signature) return;
+
+    history.unshift({
+
+        signature,
+
+        time:new Date().toLocaleString(),
+
+        status:data.ml_status || "—",
+
+        risk:data.risk_level || "—",
+
+        probability:data.max_ddos_probability ?? 0,
+
+        ddos:data.ddos_flows ?? 0,
+
+        response:data.response || "—"
+
+    });
+
+    localStorage.setItem("ddosHistory", JSON.stringify(history.slice(0,50)));
+
+}
+
+
+
+function renderHistory(){
+
+    const history = JSON.parse(localStorage.getItem("ddosHistory") || "[]");
+
+    const tbody = document.getElementById("historyTable");
+
+    tbody.innerHTML = history.length ? history.map(h=>`
+
+        <tr><td>${escapeHTML(h.time)}</td>
+
+        <td>${escapeHTML(h.status)}</td>
+
+        <td>${escapeHTML(h.risk)}</td>
+
+        <td>${h.probability}%</td>
+
+        <td>${h.ddos}</td>
+
+        <td>${escapeHTML(h.response)}</td></tr>`).join("")
+
+        : `<tr><td colspan="6" class="small">No history recorded yet.</td></tr>`;
+
+}
+
+
+
+function clearHistory(){
+
+    localStorage.removeItem("ddosHistory");
+
+    renderHistory();
+
+}
+
+
+
+async function analyzeSelectedFile(){
+
+    const file = document.getElementById("fileInput").files[0];
+
+    const result = document.getElementById("uploadResult");
+
+    if(!file){
+
+        result.innerHTML = `<div class="alert-box">Select a CSV file first.</div>`;
+
+        return;
+
+    }
+
+    if(!file.name.toLowerCase().endsWith(".csv")){
+
+        result.innerHTML = `<div class="alert-box"><b>Unsupported file.</b><br>Offline analysis currently accepts CSV files containing the 14 model features.</div>`;
+
+        return;
+
+    }
+
+    result.innerHTML = `<div class="ok-box">Analyzing <b>${escapeHTML(file.name)}</b>...</div>`;
+
+    try{
+
+        const form = new FormData();
+
+        form.append("file", file);
+
+        const response = await fetch("/analyze_csv", {method:"POST", body:form});
+
+        const data = await response.json();
+
+        if(!response.ok) throw new Error(data.error || "Analysis failed");
+
+        result.innerHTML = `
+
+        <div class="card" style="margin-top:16px;box-shadow:none;border:1px solid #e5e7eb">
+
+            <h2 class="section-title">Offline Analysis Result</h2>
+
+            <div class="grid cards">
+
+                <div class="card"><div class="metric-label">Total Flows</div><div class="metric">${data.total_flows}</div></div>
+
+                <div class="card"><div class="metric-label">BENIGN Flows</div><div class="metric green">${data.benign_flows}</div></div>
+
+                <div class="card"><div class="metric-label">DDoS Flows</div><div class="metric red">${data.ddos_flows}</div></div>
+
+                <div class="card"><div class="metric-label">Max DDoS Probability</div><div class="metric orange">${data.max_ddos_probability}%</div></div>
+
+            </div>
+
+            <div class="detail-grid" style="margin-top:16px">
+
+                <div class="detail"><b>ML Status</b><span>${escapeHTML(data.ml_status)}</span></div>
+
+                <div class="detail"><b>Risk Level</b><span>${escapeHTML(data.risk_level)}</span></div>
+
+                <div class="detail"><b>Peak Flow Rate</b><span>${data.peak_flow_rate} packets/s</span></div>
+
+                <div class="detail"><b>Average Flow Rate</b><span>${data.average_flow_rate} packets/s</span></div>
+
+                <div class="detail"><b>Response</b><span>${escapeHTML(data.response)}</span></div>
+
+                <div class="detail"><b>Rows Analyzed</b><span>${data.total_flows}</span></div>
+
+            </div>
+
+            <p class="small" style="margin-top:16px">File: ${escapeHTML(data.filename)}. Only the model-compatible 14 feature columns were used for prediction.</p>
+
+        </div>`;
+
+    }catch(e){
+
+        result.innerHTML = `<div class="alert-box"><b>Analysis failed.</b><br>${escapeHTML(e.message)}</div>`;
+
+    }
+
+}
+
+
+
+function useLatestResult(){
+
+    showPage("detection");
+
+    loadDetection();
+
+}
+
+
+
+document.getElementById("fileInput").addEventListener("change",function(){
+
+    const f=this.files[0];
+
+    document.getElementById("fileInfo").textContent = f ? `${f.name} — ${(f.size/1024).toFixed(1)} KB` : "No file selected.";
+
+});
+
+
+
+function refreshAll(){
+
+    loadTraffic();
+
+    loadDetection();
+
+}
+
+
+
+function escapeHTML(value){
+
+    return String(value).replace(/[&<>"']/g, c => ({
+
+        "&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#039;"
+
+    }[c]));
+
+}
+
+
+
+checkAuth();
+
+setInterval(() => {
+    if (document.getElementById("dashboardApp").style.display !== "none") {
+        loadTraffic();
+        loadDetection();
+    }
+}, 5000);
+
+</script>
+
+</body>
+
+</html>
