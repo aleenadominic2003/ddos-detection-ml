@@ -105,14 +105,24 @@ def analyze_traffic():
         if count > peak_rps:
             peak_rps = count
 
-    # -----------------------------
-    # Return results
+        # -----------------------------
+    # Calculate recent requests/sec
     # -----------------------------
 
+    now = datetime.now()
+
+    recent_requests = sum(
+        1
+        for request in requests
+        if 0 <= (now - request["timestamp"]).total_seconds() <= 5
+    )
+
+    recent_rps = round(recent_requests / 5, 2)
     return {
         "total_requests": total_requests,
         "unique_ips": unique_ips,
         "peak_rps": peak_rps,
+        "recent_rps": recent_rps,
         "average_response_time": round(
             average_response_time,
             4

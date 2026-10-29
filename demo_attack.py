@@ -1,4 +1,7 @@
 
+import os
+import json
+
 import pandas as pd
 import numpy as np
 import joblib
@@ -229,32 +232,56 @@ import os
 
 os.makedirs("demo_app/results", exist_ok=True)
 
+
+
+
+result_file = os.path.join(
+    "demo_app", "results", "detection_result.json"
+)
+os.makedirs(os.path.dirname(result_file), exist_ok=True)
+
+# Load the current session totals.
+try:
+    with open(result_file, "r", encoding="utf-8") as file:
+        previous = json.load(file)
+except (FileNotFoundError, json.JSONDecodeError):
+    previous = {}
+
+# Add this test's prediction to the existing totals.
+current_ddos = int(ddos_flows)
+current_benign = 1 - current_ddos
+
+total_flows = int(previous.get("total_flows", 0)) + 1
+benign_flows = int(previous.get("benign_flows", 0)) + current_benign
+ddos_flows_total = int(previous.get("ddos_flows", 0)) + current_ddos
+
 attack_result = {
-    "total_flows": 1,
-    "benign_flows": 0,
-    "ddos_flows": 1,
-    "total_packets": 2,
-    "peak_flow_rate": 41666.67,
-    "average_flow_rate": 41666.67,
+    "total_flows": total_flows,
+    "benign_flows": benign_flows,
+    "ddos_flows": ddos_flows_total,
+    "total_packets": int(previous.get("total_packets", 0)) + 2,
+    "peak_flow_rate": max(
+        float(previous.get("peak_flow_rate", 0)),
+        float(peak_flow_rate)
+    ),
+    "average_flow_rate": float(average_flow_rate),
     "max_ddos_probability": round(
-        float(ddos_probability),
+        max(
+            float(previous.get("max_ddos_probability", 0)),
+            float(ddos_probability)
+        ),
         4
     ),
-    "risk_level": "MEDIUM",
-    "traffic_status": "DDoS SUSPICION",
-    "ml_status": "DDoS DETECTED",
-    "response": "ALERT + MONITOR SUSPICIOUS FLOWS"
+    "risk_level": "MEDIUM" if current_ddos else "LOW",
+    "traffic_status": "DDoS SUSPICION" if current_ddos else "NORMAL",
+    "ml_status": "DDoS DETECTED" if current_ddos else "BENIGN",
+    "response": (
+        "ALERT + MONITOR SUSPICIOUS FLOWS"
+        if current_ddos else "MONITOR"
+    )
 }
 
-with open(
-    "demo_app/results/detection_result.json",
-    "w"
-) as file:
+with open(result_file, "w", encoding="utf-8") as file:
+    json.dump(attack_result, file, indent=4)
 
-    json.dump(
-        attack_result,
-        file,
-        indent=4
-    )
-
-print("\nAttack result saved for dashboard.")
+print("\nDetection result saved. Session totals updated.")
